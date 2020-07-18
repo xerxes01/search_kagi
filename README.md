@@ -26,3 +26,8 @@ Go to the below page & run the app!
 http://0.0.0.0:5000/get_response_form
 ```
 
+In the candidates string box enter all the candidate strings separated by commas (that's how its being split & preprocessed). 
+```
+eg: hello, i hate spinach, christmas is in december, iphone 12 will launch this year,..... 
+```
+
