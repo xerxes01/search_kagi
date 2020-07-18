@@ -1,6 +1,6 @@
 # Deploying on local machine
-clone the repository
-set terminal working directory as cloned repository
+1. Clone the repository
+2. Set terminal working directory as Cloned repository
 
 # Build instructions
 
@@ -9,6 +9,7 @@ sudo docker build -t my_docker_flask:latest .
 ```
 
 # Run instructions 
+The app is binded to port 5000
 
 ```bash
 sudo docker run -p 5000:5000 my_docker_flask:latest 
@@ -20,6 +21,7 @@ sudo docker run -p 5000:5000 my_docker_flask:latest
 sudo docker ps
 ```
 # Working command 
+Go to the below page & run the app!
 ```bash
 http://0.0.0.0:5000/get_response_form
 ```
