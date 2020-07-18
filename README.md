@@ -14,7 +14,7 @@ sudo docker build -t my_docker_flask:latest .
 sudo docker run -p 5000:5000 my_docker_flask:latest 
 ```
 
-# Check installation
+# Check if the container is running
 
 ```bash
 sudo docker ps
