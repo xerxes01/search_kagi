@@ -22,7 +22,7 @@ sn = SnowballStemmer('english')
 
 
 
-module = hub.load('https://tfhub.dev/google/universal-sentence-encoder-qa/3')
+module = hub.load('https://tfhub.dev/google/universal-sentence-encoder-qa/3') ### Change path to local cwd if you have the downloaded .pb model
 
 
 def angular_similarity(x,y):
@@ -41,7 +41,7 @@ def preprocess(text):
   return text
 
 
-def return_top_n(zipped,n=3):
+def return_top_n(zipped,n):
   x =  [r for s,r in sorted(zipped, key = lambda x: x[0])[::-1][:n]]
   return x
   
@@ -59,7 +59,7 @@ def get_resp():
 		query = request.form["query"]
 		weight1 = request.form["weight1"]
 		weight2 = request.form["weight2"]
-		
+		n = request.form["n"]
 
 		
 		######
@@ -72,19 +72,22 @@ def get_resp():
 			weight2 = 0.5
 		else:
 			weight2 = float(weight2)
+			
+		if n=="":
+			n = 3
+		else:
+			n = int(n)
 
 
 		######
 		sentences = sent.split(',')
 
-		preprocessed_query = preprocess(query)
-		preprocessed_sentences = [preprocess(sent) for sent in sentences]
 
 		candidate_embeddings = module.signatures['response_encoder'](
-	    	input=tf.constant(preprocessed_sentences),
-	    	context=tf.constant(preprocessed_sentences))['outputs']
+	    	input=tf.constant(sentences),
+	    	context=tf.constant(sentences))['outputs']
 
-		query_embedding = module.signatures['question_encoder'](tf.constant([preprocessed_query]))['outputs'][0]
+		query_embedding = module.signatures['question_encoder'](tf.constant([query]))['outputs'][0]
 		similarities = angular_similarity([query_embedding],candidate_embeddings)
 		score = similarities[0]   ###########  Ranker 1 - USEQA Angular #########
 
@@ -92,7 +95,10 @@ def get_resp():
 
 
 	#### BM25+ ####
-
+		
+		preprocessed_query = preprocess(query)
+		preprocessed_sentences = [preprocess(sent) for sent in sentences]
+		
 		tokenized_corpus = [doc.split(" ") for doc in preprocessed_sentences]
 		ranker = BM25Plus(tokenized_corpus)
 
@@ -113,7 +119,7 @@ def get_resp():
 
 		zipped = list(zip(weighted_final,sentences))
 
-		resp1 = return_top_n(zipped)
+		resp1 = return_top_n(zipped,n)
 		
 		final = {"Query" : query,
 			"result" : resp1}
@@ -125,9 +131,11 @@ def get_resp():
 			<label for="Candidates">Candidates:</label>
 			<textarea id = "Candidates" rows="20" cols ="100" name="sent" placeholder="Enter all candidate strings here.."></textarea><br><br>
                   	USEQA_weight: <input type="number" placeholder="0.5" step="0.01" min="0" max="10" name="weight1"><br>
-                  	BM25+_weight: <input type="number" placeholder="0.5" step="0.01" min="0" max="10" name="weight2"><br>
+                  	BM25+_weight: <input type="number" placeholder="0.5" step="0.01" min="0" max="10" name="weight2"><br><br>
+                  	Top_n_results: <input type="number" placeholder="3" name="n"><br>
                   	<input type="submit" value="Submit"><br>
                   </form>'''
+
 
 if __name__ == '__main__':
    app.run(host= '0.0.0.0',debug = True)
