@@ -4,7 +4,7 @@ Used 2 Rankers for ranking candidate strings given a search query:
 1. Angular Similarity between [USEQA](https://tfhub.dev/google/universal-sentence-encoder/4) embedded strings
 2. [BM25+](https://github.com/dorianbrown/rank_bm25) 
 
-The API is flask web app taking HTML form input
+The API is a flask web app taking HTML form input
 
 ## Deploying on local machine
 1. Clone the repository
